@@ -1,15 +1,6 @@
 from urllib.parse import urlparse
 import re
 
-
-URL_MODEL_FEATURES = [
-    'DomainLength', 'IsDomainIP', 'TLDLength', 'NoOfSubDomain', 'HasObfuscation',
-    'NoOfObfuscatedChar', 'ObfuscationRatio', 'NoOfLettersInURL', 'LetterRatioInURL',
-    'NoOfDegitsInURL', 'DegitRatioInURL', 'NoOfEqualsInURL', 'NoOfQMarkInURL',
-    'NoOfAmpersandInURL', 'NoOfOtherSpecialCharsInURL', 'SpacialCharRatioInURL', 'IsHTTPS'
-]
-
-
 def extract_features(url: str) -> dict:
     """
     Extracts Phishing URL Model features from a given URL

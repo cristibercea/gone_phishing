@@ -1,17 +1,6 @@
-from url_only_model.RFPhishingURLClassifier import RFPhishingURLClassifier
+from interface.run import run
 
-if __name__ == "__main__":
-    # NOTE: This is an URL-only classifier. It does not fetch the page itself
-    # Reference table:
-    # true positive -> real phishing site
-    # true negative -> real legitimate site
-    # false positive -> legit site misclassified as phishing (annoying, too many alarms given to the user, but passable)
-    # false negative -> phishing site misclassified as legit (dangerous, the user may be susceptible to attacks)
-    # isHttps is a great label for eliminating about 20 false positives ()
-    rf_phishing_model = RFPhishingURLClassifier()
-    rf_phishing_model.train()
-
-    # rf_phishing_model.predict_URL("<some whatever url>")
+if __name__ == "__main__": run()
 
 """
     TRAIN RESULTS:
