@@ -1,6 +1,6 @@
-import os, joblib, pandas as pd, seaborn as sns, matplotlib.pyplot as plt, numpy as np
-from sklearn.model_selection import GroupShuffleSplit
-from sklearn.metrics import accuracy_score, confusion_matrix, recall_score, f1_score
+import os, json, joblib, pandas as pd, seaborn as sns, matplotlib.pyplot as plt, numpy as np
+from sklearn.model_selection import GroupKFold, GroupShuffleSplit, GridSearchCV
+from sklearn.metrics import accuracy_score, confusion_matrix, recall_score, f1_score, make_scorer
 from sklearn.ensemble import RandomForestClassifier
 from url_model.utils.features_extractor import extract_features
 from url_model.utils.url_features import URL_FEATURES
@@ -88,13 +88,44 @@ class RFPhishingURLClassifier:
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
 
-        # TRAIN
-        self.__clf = (RandomForestClassifier(n_estimators=300, n_jobs=-1, random_state=42)
-                      if self.__clf is None else
-                      self.__clf).fit(X_train, y_train)
+        # Tune the forest only on the training partition. GroupKFold keeps URLs
+        # from the same domain together in each validation fold.
+        param_grid = {
+            # A compact grid: vary forest size, tree depth, and leaf
+            # regularization while keeping the standard sqrt feature sampling.
+            'n_estimators': [200, 300],
+            'max_depth': [None, 20],
+            'min_samples_leaf': [1, 4],
+        }
+        cv = GroupKFold(n_splits=3)
+        grid_search = GridSearchCV(
+            # Parallelize across grid-search fits, not again inside each forest.
+            estimator=RandomForestClassifier(n_jobs=1, random_state=42),
+            param_grid=param_grid,
+            # Dataset convention: 0 = phishing, 1 = legitimate.
+            scoring=make_scorer(f1_score, pos_label=0),
+            cv=cv,
+            n_jobs=-1,
+            refit=True,
+            verbose=2,
+        )
+        grid_search.fit(X_train, y_train, groups=subset['Domain'].values[train_idx])
+        self.__clf = grid_search.best_estimator_
+        print(f"Best cross-validation F1: {grid_search.best_score_:.4f}")
+        print(f"Best parameters: {grid_search.best_params_}")
 
         # SAVE MODEL STATE
         self.store_in_file(self.__clf, self.__filename)
+        params_filename = os.path.splitext(self.__filename)[0] + '_training_info.json'
+        with open(os.path.join('models', params_filename), 'w', encoding='utf-8') as info_file:
+            json.dump({
+                'best_params': grid_search.best_params_,
+                'best_cv_f1_phishing': float(grid_search.best_score_),
+                'scoring': 'F1, positive class 0 (phishing)',
+                'cv': '3-fold GroupKFold grouped by Domain',
+            }, info_file, indent=2)
+            info_file.write('\n')
+        print(f"Training details saved to: models/{params_filename}")
 
         # TEST
         y_pred = self.__clf.predict(X_test)
@@ -105,8 +136,8 @@ class RFPhishingURLClassifier:
 
         # PRINT METRICS
         print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
-        print(f"Recall:   {recall_score(y_test, y_pred):.4f}")
-        print(f"F1:       {f1_score(y_test, y_pred):.4f}")
+        print(f"Phishing recall: {recall_score(y_test, y_pred, pos_label=0):.4f}")
+        print(f"Phishing F1:     {f1_score(y_test, y_pred, pos_label=0):.4f}")
         print("The importance of each feature in model prediction\n",imp)
         print("\n")
         plt.figure(figsize=(8, 6))

@@ -1,0 +1,10 @@
+{
+  "best_params": {
+    "max_depth": null,
+    "min_samples_leaf": 1,
+    "n_estimators": 200
+  },
+  "best_cv_f1_phishing": 0.9967397786257348,
+  "scoring": "F1, positive class 0 (phishing)",
+  "cv": "3-fold GroupKFold grouped by Domain"
+}
