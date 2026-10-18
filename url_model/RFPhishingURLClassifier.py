@@ -91,11 +91,13 @@ class RFPhishingURLClassifier:
         # Tune the forest only on the training partition. GroupKFold keeps URLs
         # from the same domain together in each validation fold.
         param_grid = {
-            # A compact grid: vary forest size, tree depth, and leaf
-            # regularization while keeping the standard sqrt feature sampling.
-            'n_estimators': [200, 300],
-            'max_depth': [None, 20],
-            'min_samples_leaf': [1, 4],
+            # Broader search over forest size, tree complexity, feature
+            # sampling, and class weighting; 108 combinations in total.
+            'n_estimators': [150, 300, 450],
+            'max_depth': [None, 20, 40],
+            'min_samples_leaf': [1, 2, 4],
+            'max_features': ['sqrt', 0.5],
+            'class_weight': [None, 'balanced_subsample'],
         }
         cv = GroupKFold(n_splits=3)
         grid_search = GridSearchCV(

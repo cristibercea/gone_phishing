@@ -1,10 +1,12 @@
 {
   "best_params": {
+    "class_weight": "balanced_subsample",
     "max_depth": null,
+    "max_features": 0.5,
     "min_samples_leaf": 1,
-    "n_estimators": 200
+    "n_estimators": 150
   },
-  "best_cv_f1_phishing": 0.9967397786257348,
+  "best_cv_f1_phishing": 0.9968137044593893,
   "scoring": "F1, positive class 0 (phishing)",
   "cv": "3-fold GroupKFold grouped by Domain"
 }
