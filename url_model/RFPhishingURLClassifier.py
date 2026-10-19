@@ -1,4 +1,5 @@
-import os, json, joblib, pandas as pd, seaborn as sns, matplotlib.pyplot as plt, numpy as np
+import os, json, uuid, joblib, pandas as pd, seaborn as sns, matplotlib.pyplot as plt, numpy as np
+from datetime import datetime
 from sklearn.model_selection import GroupKFold, GroupShuffleSplit, GridSearchCV
 from sklearn.metrics import accuracy_score, confusion_matrix, recall_score, f1_score, make_scorer
 from sklearn.ensemble import RandomForestClassifier
@@ -144,9 +145,19 @@ class RFPhishingURLClassifier:
         print("\n")
         plt.figure(figsize=(8, 6))
         sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues', cbar=False, xticklabels=['Phishing', 'Legit'], yticklabels=['Phishing', 'Legit'])
-        plt.title('Confusion Matrix Heatmap')
+        best_params = grid_search.best_params_
+        params_text = ', '.join(f'{key}={value}' for key, value in best_params.items())
+        plt.title(f'Confusion Matrix Heatmap\n{params_text}')
         plt.xlabel('Predicted Labels')
         plt.ylabel('True Labels')
+        os.makedirs('figures', exist_ok=True)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+        unique_id = uuid.uuid4().hex[:8]
+        confusion_filename = f'confusion_matrix_{timestamp}_{unique_id}.png'
+        confusion_path = os.path.join('figures', confusion_filename)
+        plt.tight_layout()
+        plt.savefig(confusion_path, dpi=300, bbox_inches='tight')
+        print(f"Confusion matrix saved to: {confusion_path}")
         plt.show()
 
     def predict_URL(self, url: str) -> str:
