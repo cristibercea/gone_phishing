@@ -6,18 +6,18 @@ Phishing is a type of cyberattack where a victim receives a malicious email, tex
 ## 2. Problem statement
 One way to detect URL phishing is by examining the link. Since phishing is illegal the domains are usually suspicious and contain uncommon top-level domains or dangerous extensions. Our project uses machine learning to identify such phishing links. This was done by finding open datasets of regular and phishing links and training a model on them. This model can therefore be used to check suspicious links to see if they are likely to be phishing attempts. It could potentially be used with a proxy web extension to intercept traffic to potential phishing links and warn the user that the link they have clicked on is suspicious.
 
-#### 2.1 Scope
+### 2.1 Scope
 We will limit the scope to using ML to identify URLs as either malicious or safe even though there are other methods of examining URLs. For example the tool CheckPhish looks at the DNS data, redirects, ip addresses, location of the provider, gives a screenshot of the website and more, along with a verdict about the site's security. These features are useful to determine the legitimacy of a URL. However for this project we limit our scope to using ML and only looking at the URL itself.
 
 ## 3. Method
-#### 3.1 Machine Learning Models
+### 3.1 Machine Learning Models
 After testing a few model families we chose to use the Random Forest model. The reason is that in our initial testing Random Forrest outperformed the other tested models. The three models we tested were Random Forest, Gradient Boosting and Logistic Regression and Gradient boosting also performed well. Gradient boosting also performed well even though it was outperformed by Random Forest. On the other hand Logistic Regression performed relatively poorly compared to the other models. Therefore we chose Random Forest
-#### 3.2 Databases
+### 3.2 Databases
 The databases we used are the LegitPhish Database and PhiUSIIL. Both are open databases, but PhiUSIILis significantly larger than LegitPhish . Our strategy was to decide which machine learning model we should use based on the models performance on the OpenPhish database. In order to take that model and fine tune it on the larger Phishtank database.
 
 According to common Machine Learning praxis the databases were split so that 80% of the data was training data and 20% testing data. So the finished model can be tested on data it has not seen.
 
-#### 3.3 Features
+### 3.3 Features
 The model is trained based on the following features (in order of importance):
 
 | Feature               | Description   |
@@ -40,7 +40,7 @@ IsDomainIP | Binary flag (1) if IP address or (0) otherwise.
 ObfuscationRatio | Ratio of percentage characters to the URL length.
 HasObfuscation | Binary flag: (1) if at least one percentage character is detected, (0) otherwise. 
 
-#### 3.4 Requierments
+### 3.4 Requirements
 
 The following dependencies on external libraries are needed to run the project:
 
@@ -52,6 +52,8 @@ The following dependencies on external libraries are needed to run the project:
 - numpy==2.4.6
 ## 4 Results and Discussion
 Our resulting Random Forest model performed well on the testing data from the PhiUSIIL database. The confusion matrix below shows that out of the 26923 legit URLs in the data set only 25 were classified as phishing and of the 19798 phishing URLs only 89 were classified as legit. This means that our model was performant with a small error rate. 
+
+![Confusion Matrix](figures/confusion_matrix.png)
 
 For context this means that if you check a malicious URL the predicted probability that it passes our filter as a legitimate URL is 0.45%. However this could be a problem if our solution is implemented at scale since we should expect some links to get through.
 
