@@ -100,3 +100,4 @@ It is worth noting for the scope of this project, features using levenshtein dis
 - https://www.sciencedirect.com/science/article/pii/S2352340925006961
 - https://archive.ics.uci.edu/dataset/967/phiusiil+phishing+url+dataset
 - https://checkphish.bolster.ai/
+- https://www.geeksforgeeks.org/random-forest-classifier-using-scikit-learn/
