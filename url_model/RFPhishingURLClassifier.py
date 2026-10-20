@@ -54,7 +54,7 @@ class RFPhishingURLClassifier:
         # FETCH DATASET
         if not os.path.exists(dataset_filename): raise FileNotFoundError(f'Dataset csv file \'{dataset_filename}\' not found!')
         PhiUSIIL = pd.read_csv(dataset_filename)
-
+        '''
         # SELECT RELEVANT FEATURES
         subset = PhiUSIIL[URL_FEATURES + ['label', 'Domain']].dropna()
         X = subset[URL_FEATURES].values        # input:  URL metrics
@@ -69,20 +69,22 @@ class RFPhishingURLClassifier:
         - we keep the group split because there is the stronger claim: no variant of any
           test domain appeared in training.
         """
+        '''
 
         # TODO: maybe try recalculating the whole dataset features using extract_features and train again (if you cant solve extract_features function)
-        # raw = pd.read_csv(dataset_filename)[['URL', 'label', 'Domain']].dropna(subset=['label'])
-        # regen = pd.DataFrame([extract_features(u) for u in raw['URL']])
+        raw = pd.read_csv(dataset_filename)[['URL', 'label', 'Domain']].dropna(subset=['label'])
+        regen = pd.DataFrame([extract_features(u) for u in raw['URL']])
         # # Sanity: every training feature must exist in the extractor output
-        # missing = set(URL_FEATURES) - set(regen.columns)
-        # if missing:
-        #     raise KeyError(f"extract_features is missing: {missing}")
-        # X = regen[URL_FEATURES].values.astype(float)
-        # y = raw['label'].astype(int).values
-        # groups = raw['Domain'].values  # still group by registrable domain
+        missing = set(URL_FEATURES) - set(regen.columns)
+        if missing:
+            raise KeyError(f"extract_features is missing: {missing}")
+
+        X = regen[URL_FEATURES].values.astype(float)
+        y = raw['label'].astype(int).values
+        groups = raw['Domain'].values  # still group by registrable domain
         #
-        # gss = GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
-        # train_idx, test_idx = next(gss.split(X, y, groups=groups))
+        gss = GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
+        train_idx, test_idx = next(gss.split(X, y, groups=groups))
 
         # TRAINING & TEST DATA SPLIT
         X_train, X_test = X[train_idx], X[test_idx]

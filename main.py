@@ -2,27 +2,28 @@ from interface.run import run
 
 if __name__ == "__main__": run()
 
-"""
+"""    
     TRAIN RESULTS:
-        Accuracy: 0.9976
-        Recall:   0.9991
-        F1:       0.9979
+        Accuracy: 0.9973
+        Recall:   0.9988
+        F1:       0.9976
     The importance of each feature in model prediction
-        IsHTTPS                       3.843669e-01   <- most important feature!
-        NoOfOtherSpecialCharsInURL    1.666703e-01
-        NoOfDegitsInURL               8.939761e-02
-        DegitRatioInURL               8.483394e-02
-        LetterRatioInURL              7.898492e-02
-        SpacialCharRatioInURL         6.637585e-02
-        NoOfLettersInURL              5.120085e-02
-        NoOfSubDomain                 3.819409e-02
-        DomainLength                  2.860064e-02
-        TLDLength                     9.194254e-03
-        NoOfQMarkInURL                1.512355e-03
-        NoOfEqualsInURL               6.461848e-04
-        NoOfAmpersandInURL            1.875296e-05
-        IsDomainIP                    2.292433e-06
-        ObfuscationRatio              4.877918e-07
-        NoOfObfuscatedChar            4.186237e-07
-        HasObfuscation                1.318598e-07   <- least important feature!
+        IsHTTPS                       0.391692
+        NoOfDegitsInURL               0.131523
+        DegitRatioInURL               0.129667
+        LetterRatioInURL              0.114231
+        NoOfLettersInURL              0.093652
+        DomainLength                  0.077025
+        NoOfSubDomain                 0.047925
+        TLDLength                     0.007625
+        NoOfQMarkInURL                0.003230
+        NoOfEqualsInURL               0.001290
+        NoOfOtherSpecialCharsInURL    0.000941
+        SpacialCharRatioInURL         0.000915
+        NoOfAmpersandInURL            0.000251
+        NoOfObfuscatedChar            0.000011
+        IsDomainIP                    0.000010
+        ObfuscationRatio              0.000009
+        HasObfuscation                0.000002
+
 """
