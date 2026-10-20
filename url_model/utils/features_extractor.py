@@ -7,7 +7,6 @@ def extract_features(url: str) -> dict:
     :param url: the url to extract features from
     :return: features dictionary for Phishing URL Model of the given URL
     """
-    # TODO
     u = str(url)
     p = urlparse(u if '://' in u else 'http://' + u)
     host = p.netloc.split(':')[0]

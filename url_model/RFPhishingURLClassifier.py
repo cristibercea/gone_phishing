@@ -51,38 +51,33 @@ class RFPhishingURLClassifier:
         :raises FileNotFoundError: if the database csv file does not exist
         :return: None
         """
-        # FETCH DATASET
         if not os.path.exists(dataset_filename): raise FileNotFoundError(f'Dataset csv file \'{dataset_filename}\' not found!')
-        PhiUSIIL = pd.read_csv(dataset_filename)
-        '''
-        # SELECT RELEVANT FEATURES
-        subset = PhiUSIIL[URL_FEATURES + ['label', 'Domain']].dropna()
-        X = subset[URL_FEATURES].values        # input:  URL metrics
-        y = subset['label'].astype(int).values       # output: phishing/legit
 
-        # GROUP INPUT DATA BY URL DOMAIN
-        gss = GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
-        train_idx, test_idx = next(gss.split(X, y, groups=subset['Domain'].values))
         """
-        - grouping by registrable domain does not change the model's test performance
-          (hosts are ~94% singletons, so this is closer to a random split than it looks).
-        - we keep the group split because there is the stronger claim: no variant of any
-          test domain appeared in training.
-        """
-        '''
+        # code to test our feature extraction function;
+            from extract_features import extract_features
+            PhiUSIIL = pd.read_csv(dataset_filename)[['URL', 'label', 'Domain']].dropna(subset=['label'])
+            sample = PhiUSIIL.sample(2000, random_state=0).copy()
+            regen = pd.DataFrame([extract_features(u) for u in sample['URL']])
 
-        # TODO: maybe try recalculating the whole dataset features using extract_features and train again (if you cant solve extract_features function)
+            for col in URL_MODEL_FEATURES:
+                delta = (regen[col].values - sample[col].values)
+                match = (np.abs(delta) < 1e-6).mean()
+                print(f"{col:35s} match={match:.3f}  mean_delta={delta.mean():+.4f}")
+            exit(0)
+        """
+
+        # FETCH DATASET AND SELECT RELEVANT FEATURES
         raw = pd.read_csv(dataset_filename)[['URL', 'label', 'Domain']].dropna(subset=['label'])
         regen = pd.DataFrame([extract_features(u) for u in raw['URL']])
-        # # Sanity: every training feature must exist in the extractor output
+        # Sanity check: every training feature must exist in the extractor output
         missing = set(URL_FEATURES) - set(regen.columns)
-        if missing:
-            raise KeyError(f"extract_features is missing: {missing}")
+        if missing: raise KeyError(f"extract_features is missing: {missing}")
 
         X = regen[URL_FEATURES].values.astype(float)
         y = raw['label'].astype(int).values
-        groups = raw['Domain'].values  # still group by registrable domain
-        #
+        groups = raw['Domain'].values     # group by registrable domain
+
         gss = GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
         train_idx, test_idx = next(gss.split(X, y, groups=groups))
 
@@ -123,7 +118,7 @@ class RFPhishingURLClassifier:
         Predict the URL using trained model.
         :param url: the URL to predict
         :return: "Phishing URL" if the URL is considered a phishing URL, "Legit URL" otherwise
-        :raises AttributeError | : if the URL model is not loaded
+        :raises AttributeError: if the URL model is not loaded
         """
         if self.__clf is None: raise AttributeError('No URL model loaded!')
         validate_url(url)
@@ -133,18 +128,4 @@ class RFPhishingURLClassifier:
         phish_idx = int(np.where(self.__clf.classes_ == 0)[0][0])
         p_phish = float(proba[phish_idx])
         label = "Phishing URL!" if p_phish >= 0.5 else "Legit URL!"
-        return f"{label} Probability: {p_phish:.3f}"
-
-
-"""
-# code to test our feature extraction function;
-from extract_features import extract_features
-sample = PhiUSIIL.sample(2000, random_state=0).copy()
-    regen = pd.DataFrame([extract_features(u) for u in sample['URL']])
-
-    for col in URL_MODEL_FEATURES:
-        delta = (regen[col].values - sample[col].values)
-        match = (np.abs(delta) < 1e-6).mean()
-        print(f"{col:35s} match={match:.3f}  mean_delta={delta.mean():+.4f}")
-    exit(0)
-"""
+        return f"{label} Probability of being a phishing URL: {p_phish:.3f}"

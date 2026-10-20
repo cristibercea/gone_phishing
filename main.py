@@ -25,5 +25,4 @@ if __name__ == "__main__": run()
         IsDomainIP                    0.000010
         ObfuscationRatio              0.000009
         HasObfuscation                0.000002
-
 """
