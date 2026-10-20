@@ -53,8 +53,7 @@ The following dependencies on external libraries are needed to run the project:
 ## 4 Results and Discussion
 Our resulting Random Forest model performed well on the testing data from the PhiUSIIL database. The confusion matrix below shows that out of the 26923 legit URLs in the data set only 25 were classified as phishing and of the 19798 phishing URLs only 89 were classified as legit. This means that our model was performant with a small error rate. 
 
-![Confusion Matrix](figures/confusion_matrix.png=400x400))
-
+<img src="figures/confusion_matrix.png" alt="Confusion Matrix" style="width:50%; height:auto;">
 For context this means that if you check a malicious URL the predicted probability that it passes our filter as a legitimate URL is 0.45%. However this could be a problem if our solution is implemented at scale since we should expect some links to get through.
 
 There are also some edge cases and types of phishing links which our model is bad at identifying. For example our model detects https://www.amaz0n.com as a legit link since numbers in URL are not inherently suspicious like in 1177.se and our model does not know that amaz0n is close to the legit domain amazon. 
